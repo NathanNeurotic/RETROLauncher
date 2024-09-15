@@ -1,0 +1,4 @@
+snes9x2002_frameskip = "disabled"
+snes9x2002_frameskip_interval = "1"
+snes9x2002_frameskip_threshold = "30"
+snes9x2002_overclock_cycles = "disabled"
