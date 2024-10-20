@@ -655,12 +655,16 @@ function Generar_Listas()
 			-- Ejecutar juego / estilo 1 / estilo 4 / estilo 6
 			elseif Pads.check(PAD,PAD_CROSS) and CONTROL.JOYSTICK_ON == false then
 				-- Verificar archivos / estilo 1 / estilo 4 / estilo 6
-				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+				local alt = false
+				if Pads.check(PAD,PAD_CIRCLE) and (LISTAS.IDENTIDAD == 1 or LISTAS.IDENTIDAD == 4) then
+					alt = true
+				end
+				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				if verificar == true then
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.EJECUTAR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.EJECUTAR)
 					end
-					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				else
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.ERROR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.ERROR)
@@ -816,12 +820,16 @@ function Generar_Listas()
 			-- Ejecutar juego / estilo 2
 			elseif Pads.check(PAD,PAD_CROSS) and CONTROL.JOYSTICK_ON == false then
 				-- Verificar archivos / estilo 2
-				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+				local alt = false
+				if Pads.check(PAD,PAD_CIRCLE) and (LISTAS.IDENTIDAD == 1 or LISTAS.IDENTIDAD == 4) then
+					alt = true
+				end
+				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				if verificar == true then
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.EJECUTAR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.EJECUTAR)
 					end
-					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				else
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.ERROR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.ERROR)
@@ -1031,12 +1039,16 @@ function Generar_Listas()
 			-- Ejecutar juego / estilo 3
 			elseif Pads.check(PAD,PAD_CROSS) and CONTROL.JOYSTICK_ON == false then
 				-- Verificar archivos / estilo 3
-				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+				local alt = false
+				if Pads.check(PAD,PAD_CIRCLE) and (LISTAS.IDENTIDAD == 1 or LISTAS.IDENTIDAD == 4) then
+					alt = true
+				end
+				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				if verificar == true then
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.EJECUTAR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.EJECUTAR)
 					end
-					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				else
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.ERROR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.ERROR)
@@ -1232,12 +1244,16 @@ function Generar_Listas()
 			-- Ejecutar juego / estilo 5
 			elseif Pads.check(PAD,PAD_CROSS) and CONTROL.JOYSTICK_ON == false then
 				-- Verificar archivos / estilo 5
-				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+				local alt = false
+				if Pads.check(PAD,PAD_CIRCLE) and (LISTAS.IDENTIDAD == 1 or LISTAS.IDENTIDAD == 4) then
+					alt = true
+				end
+				local verificar = existe(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				if verificar == true then
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.EJECUTAR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.EJECUTAR)
 					end
-					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE])
+					ejecutar_juego(LISTAS.IDENTIDAD,LISTAS.ROMS[LISTAS.INDICE],alt)
 				else
 					if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.ERROR ~= nil then
 						Sound.playADPCM(1,MENU_SONIDOS.ERROR)
@@ -1317,14 +1333,51 @@ function Generar_Listas()
 			fix_ps2_pos1 = 270
 			fix_ps2_cen = 46
 		end
-		if OPCIONES.GUI_LIMPIA_ON == 0 then
+		if OPCIONES.GUI_LIMPIA_ON == 0 and LISTAS.SCREENSHOT_FULL == false then
 			Graphics.drawRect(CONTROL.LISTA_ANCHO+fix_ps2_pos2-3,CONTROL.LISTA_ALTO+fix_ps2_pos1-4,315-fix_ps2_lag,26,COLOR.NEGRO)
-			Graphics.drawScaleImage(PAD_IMG.CIRCLE,CONTROL.LISTA_ANCHO+fix_ps2_cen+fix_ps2_pos2,CONTROL.LISTA_ALTO+fix_ps2_pos1,20,20)
-			Font.ftPrint(CONTROL.fontARCA,CONTROL.LISTA_ANCHO+25+fix_ps2_cen+fix_ps2_pos2,CONTROL.LISTA_ALTO+fix_ps2_pos1,0,0,5,"GAME SETTINGS",COLOR.BLANCO)
+			if CONTROL.JOYSTICK_ON == false then
+				Graphics.drawScaleImage(PAD_IMG.CIRCLE,CONTROL.LISTA_ANCHO+fix_ps2_cen+fix_ps2_pos2,CONTROL.LISTA_ALTO+fix_ps2_pos1,20,20)
+				Font.ftPrint(CONTROL.fontARCA,CONTROL.LISTA_ANCHO+25+fix_ps2_cen+fix_ps2_pos2,CONTROL.LISTA_ALTO+fix_ps2_pos1,0,0,5,"GAME SETTINGS",COLOR.BLANCO)
+			else
+				Font.ftPrint(CONTROL.fontARCA,CONTROL.LISTA_ANCHO+3+fix_ps2_pos2,CONTROL.LISTA_ALTO+fix_ps2_pos1,0,0,5,"FOUND GAMES: " .. #LISTAS.ROMS,CAMBIOS_EMUS.COLOR_EMU)
+			end
 		end
 		if Pads.check(PAD,PAD_CIRCLE) and CONTROL.JOYSTICK_ON == false then
 			menu_neutrino(LISTAS.ROMS[LISTAS.INDICE])
 		end
+	elseif #LISTAS.ROMS >= 1 and LISTAS.IDENTIDAD ~= 14 and Pads.check(PAD,PAD_CIRCLE) and OPCIONES.GUI_LIMPIA_ON == 0 and LISTAS.SCREENSHOT_FULL == false then
+		local fix_ps2_pos1 = 0
+		local fix_ps2_pos2 = 0
+		local fix_ps2_cen = 0
+		local fix_ps2_lag = 0
+		local text_con = "FOUND GAMES: "
+		if  LISTAS.IDENTIDAD == 13 then
+			text_con = "FOUND APPS: "
+		end
+		if CONTROL.ESTILO == 1 then
+			fix_ps2_pos1 = 270
+			fix_ps2_cen = 46
+		elseif CONTROL.ESTILO == 2 then
+			fix_ps2_pos1 = 262
+			fix_ps2_pos2 = 137
+			fix_ps2_cen = 46
+			fix_ps2_lag = 4
+		elseif CONTROL.ESTILO == 3 then
+			fix_ps2_pos1 = 118
+			fix_ps2_cen = 46
+		elseif CONTROL.ESTILO == 4 then
+			fix_ps2_pos1 = 270
+			fix_ps2_cen = 46
+		elseif CONTROL.ESTILO == 5 then
+			fix_ps2_pos1 = 96
+			fix_ps2_lag = 9
+			fix_ps2_cen = 44
+		elseif CONTROL.ESTILO == 6 then
+			fix_ps2_pos1 = 270
+			fix_ps2_cen = 46
+		end
+		Graphics.drawRect(CONTROL.LISTA_ANCHO+fix_ps2_pos2-3,CONTROL.LISTA_ALTO+fix_ps2_pos1-4,315-fix_ps2_lag,26,COLOR.NEGRO)
+		Font.ftPrint(CONTROL.fontARCA,CONTROL.LISTA_ANCHO+3+fix_ps2_pos2,CONTROL.LISTA_ALTO+fix_ps2_pos1,0,0,5,text_con .. #LISTAS.ROMS,CAMBIOS_EMUS.COLOR_EMU)
 	end
 	
 	--- Líneas para cambiar de emulador

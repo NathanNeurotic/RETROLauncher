@@ -187,9 +187,9 @@ function verificar_sonidos(sonido,dir) -- Verifica los sonidos
 end
 
 MENU_SONIDOS = {
+	ERROR = verificar_sonidos(ERROR,"System/Medios/Sound/Menu/error.adp");
 	CANCELAR = verificar_sonidos(CANCELAR,"System/Medios/Sound/Menu/back.adp");
 	MOVER = verificar_sonidos(MOVER,"System/Medios/Sound/Menu/move.adp");
-	ERROR = verificar_sonidos(ERROR,"System/Medios/Sound/Menu/error.adp");
 	MUSICA = verificar_sonidos(MUSICA,"System/Medios/Sound/Background/music.adp");
 	EJECUTAR = verificar_sonidos(EJECUTAR,"System/Medios/Sound/Menu/run.adp");
 	NETX = verificar_sonidos(NETX,"System/Medios/Sound/Menu/next.adp");
@@ -1470,6 +1470,31 @@ function menu_config() -- Muestra, cambia y guarda las configuraciones
 		if rev2 == true then
 			lista_config[8] = 1
 		end
+		if Pads.check(PAD,PAD_R3) or Pads.check(PAD,PAD_L3) and CONTROL.JOYSTICK_ON == false then
+			if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.EJECUTAR ~= nil then
+				Sound.playADPCM(1,MENU_SONIDOS.EJECUTAR)
+			end
+			if doesFileExist("System/Medios/Default/HELP.png") then
+				local yoshi = true
+				local help = Graphics.loadImage("System/Medios/Default/HELP.png")
+				while yoshi do
+					CONTROL.FPS = Screen.getFPS(1)
+					capturar(JOYSTICK_LIMITE)
+					Screen.clear(CAMBIOS_EMUS.COLOR_EMU_BACK)
+					Graphics.drawScaleImage(help,-5,0,CONTROL.ANCHO+5,CONTROL.ALTO)
+					refrescar()
+					if not Pads.check(PAD,PAD_L3) and not Pads.check(PAD,PAD_R3) and not Pads.check(PAD,PAD_CIRCLE) and not Pads.check(PAD,PAD_TRIANGLE) and not Pads.check(PAD,PAD_CROSS) and PAD ~= 0 then
+						yoshi = false
+						if OPCIONES.SOUND_ON == 1 and MENU_SONIDOS.CANCELAR ~= nil then
+							Sound.playADPCM(1,MENU_SONIDOS.CANCELAR)
+						end
+					end
+				end
+				CONTROL.JOYSTICK_ON = true
+				JOYSTICK_LIMITE = control_FPS(1)
+				Graphics.freeImage(help)
+			end
+		end
 		if Pads.check(PAD,PAD_CIRCLE) or Pads.check(PAD,PAD_TRIANGLE) and CONTROL.JOYSTICK_ON == false then
 			noob = false
 			CONTROL.JOYSTICK_ON = true 
@@ -2656,10 +2681,12 @@ function cargar_logo(identidad) -- Determina que logo cargar de acuerdo al emula
 	end
 end
 
-function existe(identidad,nombre_juego) -- Verifica los ROMS y archivos necesarios de cada emulador
+function existe(identidad,nombre_juego,alternativo) -- Verifica los ROMS y archivos necesarios de cada emulador
 	local actual = System.currentDirectory() 
 	if identidad == 1 then -- Verifica si existen emulador/juego SEGA Megadrive
-		if doesFileExist(actual .."/Roms/Roms Sega Megadrive/".. nombre_juego) and doesFileExist(actual .."/System/RetroarchPS2/Sega Megadrive/cores/picodrive_libretro_ps2.elf") then	
+		if doesFileExist(actual .."/Roms/Roms Sega Megadrive/".. nombre_juego) and doesFileExist(actual .."/System/RetroarchPS2/Sega Megadrive/cores/picodrive_libretro_ps2.elf") and alternativo == false then	
+			return true
+		elseif doesFileExist(actual .."/Roms/Roms Sega Megadrive/".. nombre_juego) and doesFileExist(actual .."/System/RetroarchPS2/Sega Megadrive/cores/picodrive_libretro_ps2_alt.elf") and alternativo == true then	
 			return true
 		else
 			return false
@@ -2677,7 +2704,9 @@ function existe(identidad,nombre_juego) -- Verifica los ROMS y archivos necesari
 			return false
 		end
 	elseif identidad == 4 then -- Verifica si existen emulador/juego Nintendo Famicom
-		if doesFileExist(actual .."/Roms/Roms Nintendo Famicom/".. nombre_juego) and doesFileExist(actual .."/System/RetroarchPS2/Nintendo Famicom/cores/fceumm_libretro_ps2.elf") then	
+		if doesFileExist(actual .."/Roms/Roms Nintendo Famicom/".. nombre_juego) and doesFileExist(actual .."/System/RetroarchPS2/Nintendo Famicom/cores/fceumm_libretro_ps2.elf") and alternativo == false then	
+			return true
+		elseif doesFileExist(actual .."/Roms/Roms Nintendo Famicom/".. nombre_juego) and doesFileExist(actual .."/System/RetroarchPS2/Nintendo Famicom/cores/quicknes_libretro_ps2.elf") and alternativo == true then	
 			return true
 		else
 			return false
@@ -3448,11 +3477,15 @@ function ejecutar_iso(nombre) -- Ejecuta las ISO de Play Station 2
 	end
 end
 
-function ejecutar_juego(identidad,nombre_juego) -- Ejecuta la ROM con su respectivo emulador
+function ejecutar_juego(identidad,nombre_juego,alternativo) -- Ejecuta la ROM con su respectivo emulador
 	local actual = System.currentDirectory()
 	if identidad == 1 then -- Ejecutar para SEGA Megadrive
 		guardar()
-		System.loadELF(actual .."/System/RetroarchPS2/Sega Megadrive/cores/picodrive_libretro_ps2.elf",0,actual .."/Roms/Roms Sega Megadrive/".. nombre_juego)
+		if alternativo == true then
+			System.loadELF(actual .."/System/RetroarchPS2/Sega Megadrive/cores/picodrive_libretro_ps2_alt.elf",0,actual .."/Roms/Roms Sega Megadrive/".. nombre_juego)
+		else
+			System.loadELF(actual .."/System/RetroarchPS2/Sega Megadrive/cores/picodrive_libretro_ps2.elf",0,actual .."/Roms/Roms Sega Megadrive/".. nombre_juego)
+		end
 	elseif identidad == 2 then -- Ejecutar para SEGA Master System
 		guardar()
 		System.loadELF(actual .."/System/RetroarchPS2/Sega Master System/cores/picodrive_libretro_ps2.elf",0,actual .."/Roms/Roms Sega Master System/".. nombre_juego)
@@ -3461,7 +3494,11 @@ function ejecutar_juego(identidad,nombre_juego) -- Ejecuta la ROM con su respect
 		System.loadELF(actual .."/System/RetroarchPS2/Sega Game Gear/cores/picodrive_libretro_ps2.elf",0,actual .."/Roms/Roms Sega Game Gear/".. nombre_juego)
 	elseif identidad == 4 then -- Ejecutar para Nintendo Famicom
 		guardar()
-		System.loadELF(actual .."/System/RetroarchPS2/Nintendo Famicom/cores/fceumm_libretro_ps2.elf",0,actual .."/Roms/Roms Nintendo Famicom/".. nombre_juego)
+		if alternativo == true then
+			System.loadELF(actual .."/System/RetroarchPS2/Nintendo Famicom/cores/quicknes_libretro_ps2.elf",0,actual .."/Roms/Roms Nintendo Famicom/".. nombre_juego)
+		else
+			System.loadELF(actual .."/System/RetroarchPS2/Nintendo Famicom/cores/fceumm_libretro_ps2.elf",0,actual .."/Roms/Roms Nintendo Famicom/".. nombre_juego)
+		end
 	elseif identidad == 5 then -- Ejecutar para Nintendo Game Boy
 		guardar()
 		System.loadELF(actual .."/System/RetroarchPS2/Nintendo Game Boy/cores/gambatte_libretro_ps2.elf",0,actual .."/Roms/Roms Nintendo Game Boy/".. nombre_juego)
@@ -3709,9 +3746,15 @@ function reiniciar_conf(limpiar) -- Reinicia todas las configuraciones
 	if doesFileExist(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/remaps/FCEUmm/FCEUmm.rmp") then
 		System.copyFile(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/remaps/FCEUmm/FCEUmm.rmp",actual .."/System/RetroarchPS2/Nintendo Famicom/retroarch/remaps/FCEUmm/FCEUmm.rmp")
 	end
+	if doesFileExist(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/remaps/QuickNES/QuickNES.rmp") then
+		System.copyFile(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/remaps/QuickNES/QuickNES.rmp",actual .."/System/RetroarchPS2/Nintendo Famicom/retroarch/remaps/QuickNES/QuickNES.rmp")
+	end
 	pantalla_reiniciar_conf(FONDO_LOAD,19,false)
 	if doesFileExist(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/config/FCEUmm/FCEUmm.opt") then
 		System.copyFile(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/config/FCEUmm/FCEUmm.opt",actual .."/System/RetroarchPS2/Nintendo Famicom/retroarch/config/FCEUmm/FCEUmm.opt")
+	end
+	if doesFileExist(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/config/QuickNES/QuickNES.opt") then
+		System.copyFile(actual .."/System/Respaldo/RetroarchPS2/Nintendo Famicom/retroarch/config/QuickNES/QuickNES.opt",actual .."/System/RetroarchPS2/Nintendo Famicom/retroarch/config/QuickNES/QuickNES.opt")
 	end
 	----------------------------------------------
 	
